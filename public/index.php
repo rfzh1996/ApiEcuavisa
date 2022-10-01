@@ -93,15 +93,23 @@ $app->group('/v1', function () use ($app) {
         $json = file_get_contents('items.json');
         if (!(is_null($json))) {
             $itemsold = json_decode($json, true);
-            foreach ($itemsold as $item) {
-                if ($item['id'] != $args['id']) {
-                    if (!(is_null($item))) {
+            foreach ($itemsold as &$item) {
+                if ($item['id'] == $args['id']) {
+                    $exits = true;
+                }
+            }
+            $items = array();
+            if ($exits) {
+                foreach ($itemsold as &$item) {
+                    if ($item['id'] != $args['id']) {
                         array_push($items, $item);
                     }
                 }
+                $json = json_encode($items);
+                file_put_contents('items.json', $json);
+            } else {
+                $item = array("Error" => "No existe ID");
             }
-            $json = json_encode($items);
-            file_put_contents('items.json', $json);
         } else {
             $item = array("Error" => "No existe json");
         }
